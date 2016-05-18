@@ -121,4 +121,17 @@ LABEL_STACK:
 	times 512 db 0
 	TopOfStack equ $ - LABEL_STACK - 1
 				; end of [SECTION .gs]
+
+	[SECTION .32]
+	[BITS 32]
+
+LABEL_SEG_CODE32:
+	mov ax,SelectorData
+	mov ds,ax		;ds -> data address
+	mov ax,SelectorTest
+	mov es,ax		;es <- test codes
+	mov ax, SelectorVideo
+	mov gs, ax		;gs <- videoSection address
+
 	
+      
