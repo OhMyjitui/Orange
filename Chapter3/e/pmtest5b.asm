@@ -25,7 +25,7 @@ LABEL_DESC_STACK3: Descriptor 0, TopOfStack3, DA_DRWA + DA_32 + DA_DPL3
 
 ; GDT 结束
 
-LABEL_CALL_GATE_TEST:	Gate SelectorCodeDest, 0, 0, DA_386CGate + DA_DPL0
+LABEL_CALL_GATE_TEST:	Gate SelectorCodeDest, 0, 0, DA_386CGate + DA_DPL3
 GdtLen		equ	$ - LABEL_GDT	; GDT长度
 GdtPtr		dw	GdtLen - 1	; GDT界限
 		dd	0		; GDT基地址
@@ -44,7 +44,7 @@ SelectorCodeDest 	equ     LABEL_DESC_CODE_DEST - LABEL_GDT
 SelectorStack3 equ LABEL_DESC_STACK3 - LABEL_GDT + SA_RPL3
 SelectorCodeRing3 equ LABEL_DESC_CODE_RING3 - LABEL_GDT + SA_RPL3
 ; END of [SECTION .gdt]
-SelectorCallGateTest equ LABEL_CALL_GATE_TEST - LABEL_GDT
+SelectorCallGateTest equ LABEL_CALL_GATE_TEST - LABEL_GDT+SA_RPL3
 
 [SECTION .data1]	 ; 数据段
 ALIGN	32
@@ -389,6 +389,7 @@ LABEL_CODE_RING3:
 	mov	ah, 0Ch
 	mov	al, '3'
 	mov	[gs:edi], ax
+	call SelectorCallGateTest:0
 	jmp	$
 SegCodeRing3Len	equ	$ - LABEL_CODE_RING3
 ; END of [SECTION .ring3]
@@ -405,6 +406,7 @@ SegCodeRing3Len	equ	$ - LABEL_CODE_RING3
 ;	mov ah, 0ch
 ;	mov al, '3'
 ;	mov [gs: edi], ax
+
 ;	
 ;	jmp $
 ;	
