@@ -41,8 +41,13 @@ SelectorStack		equ	LABEL_DESC_STACK	- LABEL_GDT
 SelectorLDT		equ	LABEL_DESC_LDT		- LABEL_GDT
 SelectorVideo		equ	LABEL_DESC_VIDEO	- LABEL_GDT
 SelectorCodeDest 	equ     LABEL_DESC_CODE_DEST - LABEL_GDT
+<<<<<<< HEAD
 SelectorStack3 equ LABEL_DESC_STACK3 - LABEL_GDT + SA_RPL3
 SelectorCodeRing3 equ LABEL_DESC_CODE_RING3 - LABEL_GDT + SA_RPL3
+=======
+SelectorStack3 equ LABEL_DESC_STACK3 - LABEL_GDT
+SelectorCodeRing3 equ LABEL_DESC_CODE_RING3 - LABEL_GDT
+>>>>>>> master
 ; END of [SECTION .gdt]
 SelectorCallGateTest equ LABEL_CALL_GATE_TEST - LABEL_GDT
 
