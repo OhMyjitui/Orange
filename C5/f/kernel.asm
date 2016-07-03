@@ -1,7 +1,3 @@
-
-
-
-
 SELECTOR_KERNEL_CS equ 8
 
 extern cstart
@@ -22,7 +18,7 @@ sgdt [gdt_ptr]
 call cstart
 lgdt [gdt_ptr] 
 
-jmp SELECTOR_KERNEL_CS:cstart 
+jmp SELECTOR_KERNEL_CS:csinit 
 
 csinit:
 
