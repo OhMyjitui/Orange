@@ -1,0 +1,3 @@
+添加中断
+include文件的顺序.
+stack_chk_fail 未定义的引用 -fno-stack-protector
