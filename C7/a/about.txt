@@ -1,0 +1,4 @@
+ring0 -> ring3 
+kernel.asm 有错误 未知???
+
+
