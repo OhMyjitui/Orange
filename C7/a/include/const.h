@@ -44,6 +44,9 @@
 #define	RPL_TASK	SA_RPL1
 #define	RPL_USER	SA_RPL3
 
+/* TTY */
+#define NR_CONSOLES	3	/* consoles */
+
 /* 8259A interrupt controller ports. */
 #define	INT_M_CTL	0x20	/* I/O port for interrupt controller         <Master> */
 #define	INT_M_CTLMASK	0x21	/* setting bits in this port disables ints   <Master> */
@@ -67,6 +70,8 @@
 #define KB_CMD		0x64	/* I/O port for keyboard command
 					Read : Read Status Register
 					Write: Write Input Buffer(8042 Command) */
+#define LED_CODE	0xED
+#define KB_ACK		0xFA
 
 /* VGA */
 #define	CRTC_ADDR_REG	0x3D4	/* CRT Controller Registers - Addr Register */

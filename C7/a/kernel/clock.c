@@ -1,15 +1,17 @@
 #include "type.h"
 #include "const.h"
 #include "protect.h"
-#include "proto.h"
 #include "string.h"
 #include "proc.h"
+#include "tty.h"
+#include "console.h"
 #include "global.h"
+#include "proto.h"
 
 
-PUBLIC void clock_handler(int irq) 
+PUBLIC void clock_handler(int irq)
 {
-	
+
 //	disp_str("#");
 	ticks++;
 	p_proc_ready -> ticks--;

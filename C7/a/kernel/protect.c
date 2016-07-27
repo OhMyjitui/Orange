@@ -1,10 +1,12 @@
-
 #include "type.h"
 #include "const.h"
 #include "protect.h"
-#include "proto.h"
+#include "string.h"
 #include "proc.h"
+#include "tty.h"
+#include "console.h"
 #include "global.h"
+#include "proto.h"
 
 /* 本文件内函数声明 */
 PRIVATE void init_idt_desc(unsigned char vector, u8 desc_type,
@@ -165,7 +167,7 @@ PUBLIC void init_prot()
 	for(i = 0; i < NR_TASKS; i++)
 	{
 		/* 填充 GDT 中进程的 LDT 的描述符 */
-		init_descriptor( &gdt[selector_ldt >> 3], 
+		init_descriptor( &gdt[selector_ldt >> 3],
 				vir2phys(seg2phys(SELECTOR_KERNEL_DS), proc_table[i].ldts),
 				LDT_SIZE * sizeof(DESCRIPTOR) - 1,
 				DA_LDT );
@@ -175,15 +177,15 @@ PUBLIC void init_prot()
 }
 
 /* ============================================================
-			init_descriptor 
-========================================================*/ 
+			init_descriptor
+========================================================*/
 PRIVATE void init_descriptor(DESCRIPTOR *p_desc,u32 base, u32 limit, u16 attribute)
 {
 	p_desc -> limit_low = limit & 0x0FFFF ;
-	p_desc -> base_low = base & 0x0FFFF	; 
+	p_desc -> base_low = base & 0x0FFFF	;
 	p_desc -> base_mid = (base >> 16 ) & 0x0FF ;
 	p_desc -> attr1 = attribute &0x0FF ;
-	p_desc -> limit_high_attr2 = (( limit >> 16) & 0x0F ) | (attribute >> 8) & 0xF0; 
+	p_desc -> limit_high_attr2 = (( limit >> 16) & 0x0F ) | (attribute >> 8) & 0xF0;
 	p_desc -> base_high = (base >> 24) & 0x0FF ;
 
 }
@@ -212,8 +214,8 @@ PRIVATE void init_idt_desc(unsigned char vector, u8 desc_type,
 
 PUBLIC void exception_handler(int vec_no, int err_code, int eip,int cs, int eflags)
 {
-	int i; 
-	int text_color = 0x74 ; 
+	int i;
+	int text_color = 0x74 ;
 
 
 	char * err_msg[] = {"#DE Divide Error",
@@ -238,7 +240,7 @@ PUBLIC void exception_handler(int vec_no, int err_code, int eip,int cs, int efla
 			    "#XF SIMD Floating-Point Exception"
 	};
 
-	disp_pos = 0; 
+	disp_pos = 0;
 	for(i = 0; i < 80*5; i++){
 		disp_str(" ");
 	}
@@ -258,5 +260,5 @@ PUBLIC void exception_handler(int vec_no, int err_code, int eip,int cs, int efla
 		disp_color_str("Error code:", text_color);
 		disp_int(err_code);
 	}
-	
+
 }
