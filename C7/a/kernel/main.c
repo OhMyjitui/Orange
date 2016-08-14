@@ -87,6 +87,17 @@ PUBLIC int kernel_main()
 
 }
 
+/*****************************************************************************
+ *                                get_ticks
+ *****************************************************************************/
+PUBLIC int get_ticks()
+{
+	MESSAGE msg;
+	reset_msg(&msg);
+	msg.type = GET_TICKS;
+	send_recv(BOTH, TASK_SYS, &msg);
+	return msg.RETVAL;
+}
 
 void TestA(int time)
 {
@@ -110,6 +121,7 @@ void TestB(){
 
 void TestC() {
 	int i = 0x2000;
+	assert(0);
 	while(1){
 		//disp_str("C");
 		milli_delay(10);

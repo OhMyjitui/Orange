@@ -1,10 +1,17 @@
+
+/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                               proc.c
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+                                                    Forrest Yu, 2005
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+
 #include "type.h"
 #include "const.h"
 #include "protect.h"
-#include "string.h"
-#include "proc.h"
 #include "tty.h"
 #include "console.h"
+#include "string.h"
+#include "proc.h"
 #include "global.h"
 #include "proto.h"
 
@@ -14,50 +21,46 @@ PRIVATE int  msg_send(struct proc* current, int dest, MESSAGE* m);
 PRIVATE int  msg_receive(struct proc* current, int src, MESSAGE* m);
 PRIVATE int  deadlock(int src, int dest);
 
-
-PUBLIC int sys_get_ticks()
-{
-//	disp_str("+");
-	return ticks;
-}
-
+/*****************************************************************************
+ *                                schedule
+ *****************************************************************************/
+/**
+ * <Ring 0> Choose one proc to run.
+ * 
+ *****************************************************************************/
 PUBLIC void schedule()
 {
-	PROCESS* p;
-	int greatest_ticks = 0;
+	struct proc*	p;
+	int		greatest_ticks = 0;
 
-	while(!greatest_ticks)
-	{
-		for(p = proc_table; p < proc_table+NR_TASKS+NR_PROCS  ; p++)
-		{
-			if(p -> p_flags == 0){
-				if(p -> ticks > greatest_ticks)
-				{
-					greatest_ticks = p -> ticks;
+	while (!greatest_ticks) {
+		for (p = &FIRST_PROC; p <= &LAST_PROC; p++) {
+			if (p->p_flags == 0) {
+				if (p->ticks > greatest_ticks) {
+					greatest_ticks = p->ticks;
 					p_proc_ready = p;
 				}
 			}
 		}
-		if(!greatest_ticks)
-		{
-			for( p = proc_table; p < proc_table+NR_TASKS+NR_PROCS ; p++)
-			{
-				p -> ticks = p -> priority;
-			}
-		}
+
+		if (!greatest_ticks)
+			for (p = &FIRST_PROC; p <= &LAST_PROC; p++)
+				if (p->p_flags == 0)
+					p->ticks = p->priority;
 	}
 }
+
 /*****************************************************************************
  *                                sys_sendrec
  *****************************************************************************/
 /**
  * <Ring 0> The core routine of system call `sendrec()'.
- *
+ * 
  * @param function SEND or RECEIVE
  * @param src_dest To/From whom the message is transferred.
  * @param m        Ptr to the MESSAGE body.
  * @param p        The caller proc.
- *
+ * 
  * @return Zero if success.
  *****************************************************************************/
 PUBLIC int sys_sendrec(int function, int src_dest, MESSAGE* m, struct proc* p)
@@ -110,7 +113,7 @@ PUBLIC int sys_sendrec(int function, int src_dest, MESSAGE* m, struct proc* p)
  * @param function  SEND, RECEIVE or BOTH
  * @param src_dest  The caller's proc_nr
  * @param msg       Pointer to the MESSAGE struct
- *
+ * 
  * @return always 0.
  *****************************************************************************/
 PUBLIC int send_recv(int function, int src_dest, MESSAGE* msg)
@@ -145,10 +148,10 @@ PUBLIC int send_recv(int function, int src_dest, MESSAGE* msg)
 /**
  * <Ring 0~1> Calculate the linear address of a certain segment of a given
  * proc.
- *
+ * 
  * @param p   Whose (the proc ptr).
  * @param idx Which (one proc has more than one segments).
- *
+ * 
  * @return  The required linear address.
  *****************************************************************************/
 PUBLIC int ldt_seg_linear(struct proc* p, int idx)
@@ -163,10 +166,10 @@ PUBLIC int ldt_seg_linear(struct proc* p, int idx)
  *****************************************************************************/
 /**
  * <Ring 0~1> Virtual addr --> Linear addr.
- *
+ * 
  * @param pid  PID of the proc whose address is to be calculated.
  * @param va   Virtual address.
- *
+ * 
  * @return The linear address for the given virtual address.
  *****************************************************************************/
 PUBLIC void* va2la(int pid, void* va)
@@ -188,7 +191,7 @@ PUBLIC void* va2la(int pid, void* va)
  *****************************************************************************/
 /**
  * <Ring 0~3> Clear up a MESSAGE by setting each byte to 0.
- *
+ * 
  * @param p  The message to be cleared.
  *****************************************************************************/
 PUBLIC void reset_msg(MESSAGE* p)
@@ -205,7 +208,7 @@ PUBLIC void reset_msg(MESSAGE* p)
  *
  * @attention This routine does not change `p_flags'. Make sure the `p_flags'
  * of the proc to be blocked has been set properly.
- *
+ * 
  * @param p The proc to be blocked.
  *****************************************************************************/
 PRIVATE void block(struct proc* p)
@@ -220,7 +223,7 @@ PRIVATE void block(struct proc* p)
 /**
  * <Ring 0> This is a dummy routine. It does nothing actually. When it is
  * called, the `p_flags' should have been cleared (== 0).
- *
+ * 
  * @param p The unblocked proc.
  *****************************************************************************/
 PRIVATE void unblock(struct proc* p)
@@ -237,10 +240,10 @@ PRIVATE void unblock(struct proc* p)
  * instance, if we have procs trying to send messages like this:
  * A -> B -> C -> A, then a deadlock occurs, because all of them will
  * wait forever. If no cycles detected, it is considered as safe.
- *
+ * 
  * @param src   Who wants to send message.
  * @param dest  To whom the message is sent.
- *
+ * 
  * @return Zero if success.
  *****************************************************************************/
 PRIVATE int deadlock(int src, int dest)
@@ -277,11 +280,11 @@ PRIVATE int deadlock(int src, int dest)
  * <Ring 0> Send a message to the dest proc. If dest is blocked waiting for
  * the message, copy the message to it and unblock dest. Otherwise the caller
  * will be blocked and appended to the dest's sending queue.
- *
+ * 
  * @param current  The caller, the sender.
  * @param dest     To whom the message is sent.
  * @param m        The message.
- *
+ * 
  * @return Zero if success.
  *****************************************************************************/
 PRIVATE int msg_send(struct proc* current, int dest, MESSAGE* m)
@@ -357,11 +360,11 @@ PRIVATE int msg_send(struct proc* current, int dest, MESSAGE* m)
  * <Ring 0> Try to get a message from the src proc. If src is blocked sending
  * the message, copy the message from it and unblock src. Otherwise the caller
  * will be blocked.
- *
+ * 
  * @param current The caller, the proc who wanna receive.
  * @param src     From whom the message will be received.
  * @param m       The message ptr to accept the message.
- *
+ * 
  * @return  Zero if success.
  *****************************************************************************/
 PRIVATE int msg_receive(struct proc* current, int src, MESSAGE* m)
@@ -586,3 +589,4 @@ PUBLIC void dump_msg(const char * title, MESSAGE* m)
 	       packed ? "" : "\n"/* , */
 		);
 }
+
