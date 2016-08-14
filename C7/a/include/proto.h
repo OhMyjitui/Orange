@@ -45,8 +45,11 @@ PUBLIC void in_process(TTY* p_tty, u32 key);
 
 /* proc.c */
 PUBLIC  int     sys_get_ticks();        /* sys_call */
+PUBLIC  int     sys_write(char* buf, int len, PROCESS* p_proc);
 
 /* syscall.asm */
 PUBLIC  void    sys_call();             /* int_handler */
-PUBLIC  int     get_ticks();
 
+/* 系统调用 - 用户级 */
+PUBLIC  int     get_ticks();
+PUBLIC  void    write(char* buf, int len);

@@ -27,7 +27,7 @@ ORANGESKERNEL	= kernel.bin
 OBJS		= kernel/kernel.o kernel/start.o kernel/main.o kernel/i8259.o \
 	kernel/global.o kernel/protect.o lib/kliba.o lib/klib.o lib/string.o\
 	kernel/clock.o kernel/proc.o kernel/syscall.o kernel/keyboard.o kernel/tty.o\
-	kernel/console.o
+	kernel/console.o kernel/printf.o kernel/vsprintf.o
 DASMOUTPUT	= kernel.bin.asm
 
 # All Phony Targets
@@ -112,6 +112,12 @@ kernel/tty.o: kernel/tty.c include/keyboard.h
 	$(CC) -m32 $(CFLAGS) -o $@ $<
 
 kernel/console.o: kernel/console.c
+	$(CC) -m32 $(CFLAGS) -o $@ $<
+
+kernel/printf.o: kernel/printf.c
+	$(CC) -m32 $(CFLAGS) -o $@ $<
+
+kernel/vsprintf.o: kernel/vsprintf.c
 	$(CC) -m32 $(CFLAGS) -o $@ $<
 
 lib/klib.o : lib/klib.c

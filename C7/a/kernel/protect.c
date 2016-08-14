@@ -164,7 +164,7 @@ PUBLIC void init_prot()
 	int i;
 	PROCESS* p_proc = proc_table;
 	u16 selector_ldt = INDEX_LDT_FIRST << 3;
-	for(i = 0; i < NR_TASKS; i++)
+	for(i = 0; i < NR_TASKS + NR_PROCS ; i++)
 	{
 		/* 填充 GDT 中进程的 LDT 的描述符 */
 		init_descriptor( &gdt[selector_ldt >> 3],

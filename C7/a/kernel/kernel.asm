@@ -13,9 +13,9 @@ extern	cstart
 extern	kernel_main
 extern	exception_handler
 extern	spurious_irq
-extern disp_str 
-extern delay 
-extern clock_handler 
+extern disp_str
+extern delay
+extern clock_handler
 
 ; 导入全局变量
 extern	gdt_ptr
@@ -29,7 +29,7 @@ extern sys_call_table
 
 bits 32
 
-[SECTION .data] 
+[SECTION .data]
 clock_int_msg 	db	 "^",0
 [SECTION .bss]
 StackSpace		resb	2 * 1024
@@ -112,20 +112,20 @@ csinit:		; “这个跳转指令强制使用刚刚初始化的结构”——<<O
 %macro hwint_master 1
 	call save
 
-	
+
 	in al, INT_M_CTLMASK  ; \
 	or al, (1 << %1)	;	|不允许时钟中断
 	out INT_M_CTLMASK, al 	;/
 
 	mov	al, EOI		; `. reenable
 	out	INT_M_CTL, al	;   master 8259
-	
+
 
 	sti               		;auto close interrupt, reopen interrupt
 
 	push %1;
-	call [irq_table + 4 * %1] 
-	pop ecx	
+	call [irq_table + 4 * %1]
+	pop ecx
 	cli
 
 	in al, INT_M_CTLMASK  ; \
@@ -294,16 +294,16 @@ save:
 
  	mov     esi, esp                    ;eax = 进程表起始地址
 
-	inc dword [k_reenter] 
-	cmp dword [k_reenter], 0 
+	inc dword [k_reenter]
+	cmp dword [k_reenter], 0
 	jne .1
-	
+
 	mov esp, StackTop ;切换堆栈
 
 	push restart
-	jmp [esi + RETADR - P_STACKBASE] 
+	jmp [esi + RETADR - P_STACKBASE]
 
-	
+
 .1:
 	push restart_reenter	;
 	jmp [esi + RETADR - P_STACKBASE]
@@ -313,11 +313,11 @@ save:
 ; ====================================================================================
 restart:
 	mov	esp, [p_proc_ready]
-	lldt	[esp + P_LDT_SEL] 
+	lldt	[esp + P_LDT_SEL]
 	lea	eax, [esp + P_STACKTOP]
 	mov	dword [tss + TSS3_S_SP0], eax
 restart_reenter:
-	dec	dword [k_reenter] 
+	dec	dword [k_reenter]
 	pop	gs
 	pop	fs
 	pop	es
@@ -331,8 +331,14 @@ restart_reenter:
 ;---------------------------------------------------------------------------
 sys_call:
 	call save
-	sti 
+	push dword [p_proc_ready]
+	sti
+
+	push ecx
+	push ebx
 	call [sys_call_table + eax * 4]
+	add esp, 4 * 3
+
 	mov [esi + EAXREG - P_STACKBASE], eax
 	cli
 	ret
